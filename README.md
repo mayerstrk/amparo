@@ -3,7 +3,7 @@
 # amparo
 > Making Express controllers incredibly clean, type-safe, and readable while handling all error cases elegantly.
 
-> *amparo empowers developers to write expressive, type-safe, and robust APIs by abstracting complexity and enforcing strict patterns, making it the perfect choice for modern Express applications.*
+*amparo empowers developers to write expressive, type-safe, and robust APIs by abstracting complexity and enforcing strict patterns, making it the perfect choice for modern Express applications.*
 
 amparo is a framework built to enforce type safety and simplify error handling in Express applications. It eliminates the need for try/catch blocks and promotes explicit response types for controller helpers, ensuring robust and predictable behavior. By abstracting repetitive patterns and focusing on readability, amparo empowers developers to write maintainable and elegant code.
 
@@ -151,6 +151,6 @@ const signinController = controllerBuilder(signInControllerHelper);
 - Readable and Maintainable Code: Focus on core business logic with minimal boilerplate.
 
 > Making Express controllers incredibly clean, type-safe, and readable while handling all error cases elegantly.
-
+>
 > *amparo empowers developers to write expressive, type-safe, and robust APIs by abstracting complexity and enforcing strict patterns, making it the perfect choice for modern Express applications.*
 
