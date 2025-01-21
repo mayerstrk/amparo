@@ -53,7 +53,7 @@ Controllers in amparo enforce strict type safety by requiring explicit response 
 
 The following example demonstrates how amparo enforces explicit types and simplifies complex controller patterns:
 
-```typesscript
+```typescript
 type ControllerHelper<T extends AppRequestVariant> = (
 	request: AppRequest<T>,
 	response: Response,
