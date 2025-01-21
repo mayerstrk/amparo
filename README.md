@@ -1,3 +1,5 @@
+![Amparo Logo](https://raw.githubusercontent.com/mayerstrk/amparo/refs/heads/main/amparo.webp)
+
 # amparo
 > Making Express controllers incredibly clean, type-safe, and readable while handling all error cases elegantly.
 
