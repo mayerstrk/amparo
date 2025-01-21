@@ -6,15 +6,18 @@
 amparo is a framework built to enforce type safety and simplify error handling in Express applications. It eliminates the need for try/catch blocks and promotes explicit response types for controller helpers, ensuring robust and predictable behavior. By abstracting repetitive patterns and focusing on readability, amparo empowers developers to write maintainable and elegant code.
 
 ## Core Value Propositions
-### Strong Type Safety:
-Enforce explicit response types for controller helpers, ensuring predictable and consistent API responses.
-Use generics to eliminate type ambiguity and runtime errors.
-### Elegant Error Handling:
+
+### No `try/catch` Blocks - Elegant, Centralized Error Handling:
 Simplifies edge-case management without requiring try/catch blocks.
 Allows for declarative and type-safe error handling with utilities like safe and assert.
+
 ### Readable Async Flows:
 Transform async/await into expressive, maintainable flows.
 Abstract away complex controller patterns while keeping the code concise and expressive.
+
+### Enforced Very Strong Type Safety That Balances Flexibility:
+Enforce explicit response types for controller helpers, ensuring predictable and consistent API responses.
+Use generics to eliminate type ambiguity and runtime errors.
 
 ---
 
@@ -139,9 +142,12 @@ const signInControllerHelper = async (
 const signinController = controllerBuilder(signInControllerHelper);
 ```
 
-Benefits Recap
-Explicit Type Safety: Enforce response types to ensure consistent and predictable API behavior.
-Elegant Error Handling: Simplify async error management without using try/catch.
-Readable and Maintainable Code: Focus on core business logic with minimal boilerplate.
-amparo empowers developers to write expressive, type-safe, and robust APIs by abstracting complexity and enforcing strict patterns, making it the perfect choice for modern Express applications.
+## Benefits Recap
+- No try/catch blocks
+- Explicit Type Safety: Enforce response types to ensure consistent and predictable API behavior.
+- Elegant Error Handling: Simplify async error management without using try/catch.
+- Readable and Maintainable Code: Focus on core business logic with minimal boilerplate.
+
+
+> *amparo empowers developers to write expressive, type-safe, and robust APIs by abstracting complexity and enforcing strict patterns, making it the perfect choice for modern Express applications.*
 
