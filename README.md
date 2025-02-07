@@ -120,8 +120,6 @@ const signInControllerHelper = async (
 		ErrorName.internalServerError,
 	);
 
-	console.log('IN SIGN IN', token);
-
 	response.cookie('token', token, {
 		httpOnly: true,
 		secure: true,
@@ -129,10 +127,6 @@ const signInControllerHelper = async (
 		sameSite: 'strict',
 		signed: true,
 	});
-
-	console.log('IN SIGN IN', JSON.stringify(response.get('Cookie')));
-
-	console.log(name);
 
 	return {
 		request,
