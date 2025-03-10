@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2018", // or "esnext"
+    "module": "commonjs", // or "esnext" if using ESM
+    "types": ["node", "fastify"],
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "src/*": ["src/*"],
+      "common/*": ["src/common/*"],
+      "core": ["src/core/*"],
+      "_fastify": ["src/fastify/*"],
+      "_pg": ["src/pg/*"],
+      "_zod": ["src/zod/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
