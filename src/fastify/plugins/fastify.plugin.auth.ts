@@ -9,6 +9,7 @@ type CompatibleUserShapes = { id: string };
 
 interface RequestUser {
   id: string;
+  [key: string]: string;
 }
 
 declare module "fastify" {
