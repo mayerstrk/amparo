@@ -1,6 +1,6 @@
 {
   "name": "amparo-fastify",
-  "version": "0.1.0",
+  "version": "0.1.01",
   "description": "Meta framework for beautiful, more expressive, safer typescript",
   "author": "mstark",
   "license": "MIT",

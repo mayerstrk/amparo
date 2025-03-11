@@ -1,9 +1,10 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
-import { ErrorName } from "../../common"; // Adjust path as needed
-import { assert } from "../../core/core.assert"; // Adjust path as needed
+import { ErrorName } from "../../common";
+import { assert } from "../../core/core.assert";
 import cookie from "@fastify/cookie";
 
+// TODO: Add other options e.g. _id uuid _uuid
 type CompatibleUserShapes = { id: string };
 
 interface RequestUser {
@@ -28,7 +29,7 @@ interface AuthOptions<U extends CompatibleUserShapes> {
   ) => Promise<U[]>;
 }
 
-enum AuthenticationMethod {
+const enum AuthenticationMethod {
   cookieJwt = "cookieJwt",
   xApiKey = "xApiKey",
 }
@@ -38,10 +39,8 @@ const authPlugin = fp(
     fastify: FastifyInstance,
     options: AuthOptions<U>,
   ) => {
-    // Register cookie plugin
-    await fastify.register(cookie);
-
-    // Authentication logic
+    fastify.register(cookie);
+    fastify.decorateRequest("_user");
     const authenticate = async (request: FastifyRequest) => {
       const { authenticationMethod, authenticationMethodValue } = assert(
         (() => {
@@ -66,19 +65,18 @@ const authPlugin = fp(
         ErrorName.internalServerError,
       );
 
+      const hasAtLeastOneUser = <U extends { id: string }>(
+        value: unknown,
+      ): value is [U, U[]] => Array.isArray(value) && value.length > 0;
+
       const successfulDbUserResponse = await options.getUserByAuthMethodHelper(
         authenticationMethod,
         authenticationMethodValue,
       );
 
-      if (successfulDbUserResponse.length > 0) {
-        request._user = { id: successfulDbUserResponse[0].id }; // Relies on augmentation
-      } else {
-        throw new Error("User not found");
-      }
+      request._user = { id: successfulDbUserResponse[0].id };
     };
 
-    // Add authentication to routes with config.authenticate
     fastify.addHook("onRoute", (routeOptions) => {
       if (routeOptions.config?.authenticate) {
         const preHandler = routeOptions.preHandler;
@@ -92,10 +90,7 @@ const authPlugin = fp(
       }
     });
   },
-  {
-    name: "auth-plugin",
-    fastify: "4.x", // Match your Fastify version
-  },
 );
 
-export default fp(authPlugin);
+export { AuthenticationMethod };
+export { authPlugin };
