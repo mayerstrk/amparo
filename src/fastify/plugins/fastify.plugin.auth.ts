@@ -22,11 +22,9 @@ declare module "fastify" {
 }
 
 interface AuthOptions<U extends CompatibleUserShapes> {
-  jwtSecret: string;
   getUserByAuthMethodHelper: (
     authenticationMethod: AuthenticationMethod,
     authenticationMethodValue: string,
-    jwtSecret: string,
   ) => Promise<U[]>;
 }
 
@@ -41,7 +39,6 @@ const authPlugin = fp(
     options: AuthOptions<U>,
   ) => {
     fastify.register(cookie);
-    fastify.decorateRequest("_user");
     const authenticate = async (request: FastifyRequest) => {
       const { authenticationMethod, authenticationMethodValue } = assert(
         (() => {
@@ -66,14 +63,9 @@ const authPlugin = fp(
         ErrorName.internalServerError,
       );
 
-      const hasAtLeastOneUser = <U extends { id: string }>(
-        value: unknown,
-      ): value is [U, U[]] => Array.isArray(value) && value.length > 0;
-
       const successfulDbUserResponse = await options.getUserByAuthMethodHelper(
         authenticationMethod,
         authenticationMethodValue,
-        options.jwtSecret,
       );
 
       request._user = { id: successfulDbUserResponse[0].id };
