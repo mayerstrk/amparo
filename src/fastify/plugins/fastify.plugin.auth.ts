@@ -21,31 +21,34 @@ declare module "fastify" {
   }
 }
 
-type GetUserByAuthMethodHelperOptions = {
-  authenticationMethod: AuthenticationMethod;
-  authenticationMethodValue: string;
-};
-
-interface AuthOptions<
-  U extends CompatibleUserShapes = CompatibleUserShapes,
-  O extends GetUserByAuthMethodHelperOptions = GetUserByAuthMethodHelperOptions,
-> {
-  getUserByAuthMethodHelper: (options: O) => Promise<U[]>;
-  helperArgs: O;
-}
-
 const enum AuthenticationMethod {
   cookieJwt = "cookieJwt",
   xApiKey = "xApiKey",
 }
 
+type GetUserByAuthMethodHelperRequiredOptions = {
+  authenticationMethod: AuthenticationMethod;
+  authenticationMethodValue: string;
+};
+
+interface AuthConfig<
+  O extends Record<string, string>,
+  U extends CompatibleUserShapes = CompatibleUserShapes,
+> {
+  getUserByAuthMethodHelper: (
+    requiredOptions: GetUserByAuthMethodHelperRequiredOptions,
+    addtionalOptions: O,
+  ) => Promise<U[]>;
+  getUserByAythMethodHelperAdditionalOptions: O;
+}
+
 const authPlugin = fp(
   async <
     U extends CompatibleUserShapes,
-    O extends GetUserByAuthMethodHelperOptions,
+    O extends GetUserByAuthMethodHelperRequiredOptions,
   >(
     fastify: FastifyInstance,
-    options: AuthOptions<U, O>,
+    config: AuthConfig<O, U>,
   ) => {
     fastify.register(cookie);
     const authenticate = async (request: FastifyRequest) => {
@@ -72,11 +75,10 @@ const authPlugin = fp(
         ErrorName.internalServerError,
       );
 
-      const successfulDbUserResponse = await options.getUserByAuthMethodHelper({
-        ...options.helperArgs,
-        authenticationMethod,
-        authenticationMethodValue,
-      });
+      const successfulDbUserResponse = await config.getUserByAuthMethodHelper(
+        { authenticationMethod, authenticationMethodValue },
+        config.getUserByAythMethodHelperAdditionalOptions,
+      );
 
       request._user = { id: successfulDbUserResponse[0].id };
     };
