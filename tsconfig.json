@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
+    "preserveConstEnums": true,
     "baseUrl": "./",
     "paths": {
       "src/*": ["src/*"],
