@@ -1,26 +1,49 @@
 {
   "name": "amparo-fastify",
-  "version": "0.1.01",
-  "description": "Meta framework for beautiful, more expressive, safer typescript",
+  "version": "0.1.02",
+  "description": "meta framework for beautiful, more expressive, safer typescript",
   "author": "mstark",
-  "license": "MIT",
+  "license": "mit",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "exports": {
-    ".": "./dist/index.js",
-    "./common": "./dist/common/index.js",
-    "./core": "./dist/core/index.js",
-    "./fastify": "./dist/fastify/index.js",
-    "./pg": "./dist/pg/index.js",
-    "./zod": "./dist/zod/index.js"
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./common": {
+      "import": "./dist/common/index.mjs",
+      "require": "./dist/common/index.js",
+      "types": "./dist/common/index.d.ts"
+    },
+    "./core": {
+      "import": "./dist/core/index.mjs",
+      "require": "./dist/core/index.js",
+      "types": "./dist/core/index.d.ts"
+    },
+    "./fastify": {
+      "import": "./dist/fastify/index.mjs",
+      "require": "./dist/fastify/index.js",
+      "types": "./dist/fastify/index.d.ts"
+    },
+    "./pg": {
+      "import": "./dist/pg/index.mjs",
+      "require": "./dist/pg/index.js",
+      "types": "./dist/pg/index.d.ts"
+    },
+    "./zod": {
+      "import": "./dist/zod/index.mjs",
+      "require": "./dist/zod/index.js",
+      "types": "./dist/zod/index.d.ts"
+    }
   },
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "build": "tsc --module CommonJS && tsc --module ESNext --outDir dist/esm",
+    "prepublishonly": "npm run build"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

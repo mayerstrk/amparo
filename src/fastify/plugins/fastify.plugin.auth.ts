@@ -26,6 +26,7 @@ interface AuthOptions<U extends CompatibleUserShapes> {
   getUserByAuthMethodHelper: (
     authenticationMethod: AuthenticationMethod,
     authenticationMethodValue: string,
+    jwtSecret: string,
   ) => Promise<U[]>;
 }
 
@@ -72,6 +73,7 @@ const authPlugin = fp(
       const successfulDbUserResponse = await options.getUserByAuthMethodHelper(
         authenticationMethod,
         authenticationMethodValue,
+        options.jwtSecret,
       );
 
       request._user = { id: successfulDbUserResponse[0].id };
