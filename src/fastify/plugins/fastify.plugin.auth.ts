@@ -39,7 +39,7 @@ interface AuthConfig<
     requiredOptions: GetUserByAuthMethodHelperRequiredOptions,
     addtionalOptions?: O,
   ) => Promise<U[]>;
-  getUserByAythMethodHelperAdditionalOptions: O;
+  helperAdditionalOptions?: O;
 }
 
 const authPlugin = fp(
@@ -78,7 +78,7 @@ const authPlugin = fp(
 
       const successfulDbUserResponse = await config.getUserByAuthMethodHelper(
         { authenticationMethod, authenticationMethodValue },
-        config.getUserByAythMethodHelperAdditionalOptions,
+        config.helperAdditionalOptions,
       );
 
       request._user = { id: successfulDbUserResponse[0].id };
