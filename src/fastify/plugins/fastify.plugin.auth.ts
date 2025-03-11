@@ -37,7 +37,7 @@ interface AuthConfig<
 > {
   getUserByAuthMethodHelper: (
     requiredOptions: GetUserByAuthMethodHelperRequiredOptions,
-    addtionalOptions: O,
+    addtionalOptions?: O,
   ) => Promise<U[]>;
   getUserByAythMethodHelperAdditionalOptions: O;
 }
