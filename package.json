@@ -6,45 +6,44 @@
   "license": "mit",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./common": {
-      "import": "./dist/common/index.mjs",
+      "import": "./dist/common/index.js",
       "require": "./dist/common/index.js",
       "types": "./dist/common/index.d.ts"
     },
     "./core": {
-      "import": "./dist/core/index.mjs",
+      "import": "./dist/core/index.js",
       "require": "./dist/core/index.js",
       "types": "./dist/core/index.d.ts"
     },
     "./fastify": {
-      "import": "./dist/fastify/index.mjs",
+      "import": "./dist/fastify/index.js",
       "require": "./dist/fastify/index.js",
       "types": "./dist/fastify/index.d.ts"
     },
     "./pg": {
-      "import": "./dist/pg/index.mjs",
+      "import": "./dist/pg/index.js",
       "require": "./dist/pg/index.js",
       "types": "./dist/pg/index.d.ts"
     },
     "./zod": {
-      "import": "./dist/zod/index.mjs",
+      "import": "./dist/zod/index.js",
       "require": "./dist/zod/index.js",
       "types": "./dist/zod/index.d.ts"
     }
   },
   "scripts": {
-    "build:cjs": "tsc --module CommonJS --outDir dist",
-    "build:esm": "tsc --module ESNext --outDir dist && find dist -name '*.js' -exec sh -c 'mv \"$1\" \"${1%.js}.mjs\"' _ {} \\;",
-    "build": "npm run build:cjs && npm run build:esm",
+    "build": "tsc",
     "prepublishonly": "npm run build"
   },
   "dependencies": {
@@ -65,6 +64,7 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^22.7.9",
     "@types/pg": "^8.11.11",
     "typescript": "^5.8.2",
     "zod": "^3.24.2"

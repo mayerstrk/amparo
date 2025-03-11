@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "commonjs", // or "esnext" if using ESM
-    "types": ["node", "fastify"],
+    "module": "ESNext",
     "outDir": "dist",
     "rootDir": "src",
     "declaration": true,
