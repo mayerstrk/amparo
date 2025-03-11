@@ -54,4 +54,4 @@ async function safe<T>(
   }
 }
 
-export default safe;
+export { safe };
