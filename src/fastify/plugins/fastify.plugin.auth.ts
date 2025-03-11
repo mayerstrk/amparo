@@ -44,8 +44,9 @@ interface AuthConfig<
 
 const authPlugin = fp(
   async <
-    U extends CompatibleUserShapes,
-    O extends GetUserByAuthMethodHelperRequiredOptions,
+    U extends CompatibleUserShapes = CompatibleUserShapes,
+    O extends
+      GetUserByAuthMethodHelperRequiredOptions = GetUserByAuthMethodHelperRequiredOptions,
   >(
     fastify: FastifyInstance,
     config: AuthConfig<O, U>,
