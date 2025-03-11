@@ -21,11 +21,17 @@ declare module "fastify" {
   }
 }
 
-interface AuthOptions<U extends CompatibleUserShapes> {
-  getUserByAuthMethodHelper: (
-    authenticationMethod: AuthenticationMethod,
-    authenticationMethodValue: string,
-  ) => Promise<U[]>;
+type GetUserByAuthMethodHelperOptions = {
+  authenticationMethod: AuthenticationMethod;
+  authenticationMethodValue: string;
+};
+
+interface AuthOptions<
+  U extends CompatibleUserShapes = CompatibleUserShapes,
+  O extends GetUserByAuthMethodHelperOptions = GetUserByAuthMethodHelperOptions,
+> {
+  getUserByAuthMethodHelper: (options: O) => Promise<U[]>;
+  helperArgs: O;
 }
 
 const enum AuthenticationMethod {
@@ -34,9 +40,12 @@ const enum AuthenticationMethod {
 }
 
 const authPlugin = fp(
-  async <U extends CompatibleUserShapes>(
+  async <
+    U extends CompatibleUserShapes,
+    O extends GetUserByAuthMethodHelperOptions,
+  >(
     fastify: FastifyInstance,
-    options: AuthOptions<U>,
+    options: AuthOptions<U, O>,
   ) => {
     fastify.register(cookie);
     const authenticate = async (request: FastifyRequest) => {
@@ -63,10 +72,11 @@ const authPlugin = fp(
         ErrorName.internalServerError,
       );
 
-      const successfulDbUserResponse = await options.getUserByAuthMethodHelper(
+      const successfulDbUserResponse = await options.getUserByAuthMethodHelper({
+        ...options.helperArgs,
         authenticationMethod,
         authenticationMethodValue,
-      );
+      });
 
       request._user = { id: successfulDbUserResponse[0].id };
     };
