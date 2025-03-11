@@ -62,7 +62,7 @@ class DuplicateKeyError extends CustomError {
     super(
       message || "A resource with that identifier already exists.",
       StatusCodes.BAD_REQUEST,
-      ErrorName.duplicateKey,
+      ErrorName.badRequest,
       originalError,
     );
   }

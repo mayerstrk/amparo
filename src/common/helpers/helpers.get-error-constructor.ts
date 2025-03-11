@@ -28,7 +28,7 @@ function getErrorConstructor(errorName: ErrorName): AppCustomErrorConstructor {
       return CastError;
     }
 
-    case ErrorName.duplicateKey: {
+    case ErrorName.duplicatekey: {
       return DuplicateKeyError;
     }
 

@@ -1,12 +1,12 @@
 const enum ErrorName {
-  badrequest = "badrequesterror",
+  badRequest = "badrequesterror",
   validation = "validationerror",
-  notfound = "notfounderror",
+  notFound = "notfounderror",
   cast = "casterror",
   duplicatekey = "duplicatekeyerror",
   authentication = "authenticationerror",
   authorization = "authorizationerror",
-  internalservererror = "internalservererror",
+  internalServerError = "internalservererror",
   forbidden = "forbiddenerror",
   conflict = "conflicterror",
 }
