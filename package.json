@@ -4,47 +4,51 @@
   "description": "meta framework for beautiful, more expressive, safer typescript",
   "author": "mstark",
   "license": "mit",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "type": "module",
   "files": [
-    "dist"
+    "dist/esm",
+    "dist/cjs"
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/esm/index.d.ts"
     },
     "./common": {
-      "import": "./dist/common/index.js",
-      "require": "./dist/common/index.js",
-      "types": "./dist/common/index.d.ts"
+      "import": "./dist/esm/common/index.js",
+      "require": "./dist/cjs/common/index.js",
+      "types": "./dist/esm/common/index.d.ts"
     },
     "./core": {
-      "import": "./dist/core/index.js",
-      "require": "./dist/core/index.js",
-      "types": "./dist/core/index.d.ts"
+      "import": "./dist/esm/core/index.js",
+      "require": "./dist/cjs/core/index.js",
+      "types": "./dist/esm/core/index.d.ts"
     },
     "./fastify": {
-      "import": "./dist/fastify/index.js",
-      "require": "./dist/fastify/index.js",
-      "types": "./dist/fastify/index.d.ts"
+      "import": "./dist/esm/fastify/index.js",
+      "require": "./dist/cjs/fastify/index.js",
+      "types": "./dist/esm/fastify/index.d.ts"
     },
     "./pg": {
-      "import": "./dist/pg/index.js",
-      "require": "./dist/pg/index.js",
-      "types": "./dist/pg/index.d.ts"
+      "import": "./dist/esm/pg/index.js",
+      "require": "./dist/cjs/pg/index.js",
+      "types": "./dist/esm/pg/index.d.ts"
     },
     "./zod": {
-      "import": "./dist/zod/index.js",
-      "require": "./dist/zod/index.js",
-      "types": "./dist/zod/index.d.ts"
+      "import": "./dist/esm/zod/index.js",
+      "require": "./dist/cjs/zod/index.js",
+      "types": "./dist/esm/zod/index.d.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
-    "prepublishonly": "npm run build"
+    "build:esm": "tsc --project tsconfig.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build": "npm run build:esm && npm run build:cjs",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

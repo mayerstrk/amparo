@@ -1,24 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "outDir": "dist",
-    "rootDir": "src",
-    "declaration": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "moduleResolution": "node",
-    "preserveConstEnums": true,
-    "baseUrl": "./",
+    "target": "ES2020", // Modern but widely supported (Node.js 14+)
+    "module": "ESNext", // ESM for modern usage
+    "outDir": "dist/esm", // Output ESM to a specific folder
+    "rootDir": "src", // Keep source root clean
+    "declaration": true, // Generate .d.ts files for TS users
+    "declarationMap": true, // Source maps for declarations (optional, improves dev experience)
+    "strict": true, // Enforce type safety
+    "esModuleInterop": true, // Better interop with CJS modules
+    "skipLibCheck": true, // Speed up compilation by skipping node_modules
+    "moduleResolution": "node", // Node.js-style resolution (works with ESM and CJS)
+    "preserveConstEnums": true, // Keep const enums for better runtime perf
+    "baseUrl": "./", // Relative imports
     "paths": {
+      // Your existing paths are fine for dev
       "src/*": ["src/*"],
       "common/*": ["src/common/*"],
       "core": ["src/core/*"],
       "_fastify": ["src/fastify/*"],
       "_pg": ["src/pg/*"],
       "_zod": ["src/zod/*"]
-    }
+    },
+    "sourceMap": true // Optional: Helps debugging in consuming apps
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
