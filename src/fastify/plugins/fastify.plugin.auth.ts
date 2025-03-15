@@ -19,9 +19,9 @@ const authPlugin = fp(
       getUserByAuthMethodHelper: (
         authenticationMethod: AuthenticationMethod,
         authenticationMethodValue: string,
-        options: O,
+        options?: O,
       ) => Promise<U[]>;
-      getUserByAuthHelperOptions: O;
+      getUserByAuthHelperOptions?: O;
     },
   ) => {
     fastify.register(cookie);
