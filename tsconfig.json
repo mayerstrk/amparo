@@ -12,6 +12,7 @@
     "moduleResolution": "node", // Node.js-style resolution (works with ESM and CJS)
     "preserveConstEnums": true, // Keep const enums for better runtime perf
     "baseUrl": "./", // Relative imports
+    "typeRoots": ["./node_modules/@types", "./src/index.d.ts"],
     "paths": {
       // Your existing paths are fine for dev
       "src/*": ["src/*"],

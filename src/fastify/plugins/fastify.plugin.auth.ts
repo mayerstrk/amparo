@@ -4,53 +4,27 @@ import { ErrorName } from "../../common";
 import { assert } from "../../core/core.assert";
 import cookie from "@fastify/cookie";
 
-// TODO: Add other options e.g. _id uuid _uuid
-type CompatibleUserShapes = { id: string };
-
-interface RequestUser {
-  id: string;
-  [key: string]: unknown;
-}
-
-declare module "fastify" {
-  interface FastifyRequest {
-    _user?: RequestUser;
-  }
-
-  interface FastifyContextConfig {
-    authenticate?: boolean;
-  }
-}
-
 const enum AuthenticationMethod {
   cookieJwt = "cookieJwt",
   xApiKey = "xApiKey",
 }
 
-type GetUserByAuthMethodHelperRequiredOptions = {
-  authenticationMethod: AuthenticationMethod;
-  authenticationMethodValue: string;
-};
-
-interface AuthConfig<
-  O extends Record<string, string>,
-  U extends CompatibleUserShapes = CompatibleUserShapes,
-> {
-  getUserByAuthMethodHelper: (
-    requiredOptions: GetUserByAuthMethodHelperRequiredOptions,
-    addtionalOptions?: O,
-  ) => Promise<U[]>;
-  helperAdditionalOptions?: O;
-}
-
 const authPlugin = fp(
   async <
-    U extends CompatibleUserShapes = CompatibleUserShapes,
-    O extends
-      GetUserByAuthMethodHelperRequiredOptions = GetUserByAuthMethodHelperRequiredOptions,
+    O extends {
+      authenticationMethod: AuthenticationMethod;
+      authenticationMethodValue: string;
+    } = {
+      authenticationMethod: AuthenticationMethod;
+      authenticationMethodValue: string;
+    },
+    U extends { id: string } = { id: string },
   >(
     fastify: FastifyInstance,
-    config: AuthConfig<O, U>,
+    config: {
+      getUserByAuthMethodHelper: (options: O) => Promise<U[]>;
+      options: O;
+    },
   ) => {
     fastify.register(cookie);
     const authenticate = async (request: FastifyRequest) => {
@@ -77,10 +51,11 @@ const authPlugin = fp(
         ErrorName.internalServerError,
       );
 
-      const successfulDbUserResponse = await config.getUserByAuthMethodHelper(
-        { authenticationMethod, authenticationMethodValue },
-        config.helperAdditionalOptions,
-      );
+      const successfulDbUserResponse = await config.getUserByAuthMethodHelper({
+        ...config.options,
+        authenticationMethod,
+        authenticationMethodValue,
+      });
 
       request._user = { id: successfulDbUserResponse[0].id };
     };
