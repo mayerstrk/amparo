@@ -1,3 +1,4 @@
+export * from "./fastify-module-augemantation";
 export * from "./zod";
 export * from "./fastify";
 export * from "./core";
