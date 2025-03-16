@@ -1,9 +1,9 @@
-type RequestUser<
-  I extends Record<any, any> = { id: string },
-  O extends Record<any, any> = {},
-> = I & O;
-
 declare module "fastify" {
+  type RequestUser<
+    I extends Record<any, any> = { id: string },
+    O extends Record<any, any> = {},
+  > = I & O;
+
   interface FastifyRequest {
     _user?: RequestUser;
   }
@@ -13,4 +13,4 @@ declare module "fastify" {
   }
 }
 
-export { RequestUser };
+export {};
