@@ -11,17 +11,17 @@ const enum AuthenticationMethod {
 
 const authPlugin = fp(
   async <
-    O extends Record<string, unknown>,
-    U extends { id: string } = { id: string },
+    OptionsForGetRequestByAuthMethodHelper extends Record<string, unknown>,
+    RequestUser extends { id: string } = { id: string },
   >(
     fastify: FastifyInstance,
     config: {
-      getUserByAuthMethodHelper: (
+      getRequestUserByAuthMethodHelper: (
         authenticationMethod: AuthenticationMethod,
         authenticationMethodValue: string,
-        options?: O,
-      ) => Promise<U[]>;
-      getUserByAuthHelperOptions?: O;
+        options?: OptionsForGetRequestByAuthMethodHelper,
+      ) => Promise<RequestUser>;
+      getUserByAuthMethodHelperOptions?: OptionsForGetRequestByAuthMethodHelper;
     },
   ) => {
     fastify.register(cookie);
@@ -48,13 +48,13 @@ const authPlugin = fp(
         ErrorName.authentication,
       );
 
-      const successfulDbUserResponse = await config.getUserByAuthMethodHelper(
+      const requestUser = await config.getRequestUserByAuthMethodHelper(
         authenticationMethod,
         authenticationMethodValue,
-        config.getUserByAuthHelperOptions,
+        config.getUserByAuthMethodHelperOptions,
       );
 
-      request._user = { id: successfulDbUserResponse[0].id };
+      request._user = requestUser;
     };
 
     fastify.addHook("onRoute", (routeOptions) => {
