@@ -43,10 +43,9 @@ const authPlugin = fp(
               authenticationMethodValue: request.cookies["jwt"],
             };
           }
-          throw new Error("No authentication method found");
         })(),
         "No authentication method found",
-        ErrorName.internalServerError,
+        ErrorName.authentication,
       );
 
       const successfulDbUserResponse = await config.getUserByAuthMethodHelper(
