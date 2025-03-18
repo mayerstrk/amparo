@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 import { ErrorName } from "../../common";
-import { assert } from "../../core/core.assert";
+import { assert, safe, assertWithTypeguard } from "../../core/core.assert";
 import cookie from "@fastify/cookie";
 
 const enum AuthenticationMethod {
@@ -49,10 +49,14 @@ const authPlugin = fp(
         ErrorName.authentication,
       );
 
-      const requestUser = await config.getRequestUserByAuthMethodHelper(
-        authenticationMethod,
-        authenticationMethodValue,
-        config.getUserByAuthMethodHelperOptions,
+      const requestUser = assert(
+        config.getRequestUserByAuthMethodHelper(
+          authenticationMethod,
+          authenticationMethodValue,
+          config.getUserByAuthMethodHelperOptions,
+        ),
+        "Falid to get user by auth method",
+        ErrorName.authentication,
       );
 
       request._user = requestUser;
