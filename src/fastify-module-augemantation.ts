@@ -1,13 +1,10 @@
 declare module "fastify" {
-  type RequestUser<I extends Record<any, any> = { id: string }> = I;
-
   interface FastifyRequest {
-    _user?: RequestUser;
+    _user?: unknown;
   }
 
   interface FastifyContextConfig {
     authenticate?: boolean;
   }
 }
-
 export {};

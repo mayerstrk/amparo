@@ -24,6 +24,7 @@ const authPlugin = fp(
       getUserByAuthMethodHelperOptions?: OptionsForGetRequestByAuthMethodHelper;
     },
   ) => {
+    fastify.decorateRequest("_user");
     fastify.register(cookie);
     const authenticate = async (request: FastifyRequest) => {
       const { authenticationMethod, authenticationMethodValue } = assert(
