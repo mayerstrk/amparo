@@ -3,7 +3,7 @@ import fp from "fastify-plugin";
 import { ErrorName } from "../../common";
 import { assert } from "../../core/core.assert";
 import cookie from "@fastify/cookie";
-import { safe } from "src/core";
+import { safe } from "../../core";
 
 const enum AuthenticationMethod {
   cookieJwt = "cookieJwt",
