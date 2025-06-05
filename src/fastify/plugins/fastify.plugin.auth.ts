@@ -3,6 +3,7 @@ import fp from "fastify-plugin";
 import { ErrorName } from "../../common";
 import { assert } from "../../core/core.assert";
 import cookie from "@fastify/cookie";
+import { safe } from "src/core";
 
 const enum AuthenticationMethod {
   cookieJwt = "cookieJwt",
@@ -81,7 +82,7 @@ const authPlugin = fp(
         ErrorName.authentication,
       );
 
-      const requestUser = assert(
+      const requestUser = await safe(
         config.getRequestUserByAuthMethodHelper(
           authenticationMethod,
           authenticationMethodValue,
