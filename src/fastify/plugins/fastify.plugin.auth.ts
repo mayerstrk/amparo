@@ -36,6 +36,9 @@ const authPlugin = fp(
     const authenticate = async (request: FastifyRequest) => {
       const { authenticationMethod, authenticationMethodValue } = assert(
         (() => {
+          console.warn(
+            `==================================================== ${config.passwordEmailFieldNames?.emailFieldName}`,
+          );
           const apiKey = Array.isArray(request.headers["x-api-key"])
             ? request.headers["x-api-key"][0]
             : request.headers["x-api-key"];
