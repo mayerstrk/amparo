@@ -24,7 +24,7 @@ const authPlugin = fp(
       jwtCookieName?: string;
       getRequestUserByAuthMethodHelper: (
         authenticationMethod: AuthenticationMethod,
-        authenticationMethodValue: string,
+        authenticationMethodValue: string | Record<string, unknown>,
         options?: OptionsForGetRequestByAuthMethodHelper,
       ) => Promise<RequestUser>;
       getUserByAuthMethodHelperOptions?: OptionsForGetRequestByAuthMethodHelper;
@@ -32,11 +32,7 @@ const authPlugin = fp(
   ) => {
     fastify.decorateRequest("_user");
     fastify.register(cookie);
-    const authenticate = async (
-      request: FastifyRequest & {
-        body: Record<string, unknown>;
-      },
-    ) => {
+    const authenticate = async (request: FastifyRequest) => {
       const { authenticationMethod, authenticationMethodValue } = assert(
         (() => {
           const apiKey = Array.isArray(request.headers["x-api-key"])
@@ -48,27 +44,35 @@ const authPlugin = fp(
               authenticationMethodValue: apiKey,
             };
           }
+
           //TODO: Cookie name should be passed down from consumer
-          if (request.cookies[config.jwtCookieName ?? "jwt"]) {
+          const jwtCookie = request.cookies[config.jwtCookieName ?? "jwt"];
+
+          if (jwtCookie) {
             return {
               authenticationMethod: AuthenticationMethod.cookieJwt,
-              authenticationMethodValue: request.cookies["jwt"],
+              authenticationMethodValue: jwtCookie,
             };
           }
-          if (config.passwordEmailFieldNames?.emailFieldName ?? "email") {
+
+          const emailFieldName =
+            config.passwordEmailFieldNames?.emailFieldName ?? "email";
+          const passwordFieldName =
+            config.passwordEmailFieldNames?.passwordFieldName ?? "password";
+
+          const emailValue = (request.body as { [emailFieldName]: string })[
+            emailFieldName
+          ];
+          const passwordValue = (
+            request.body as { [passwordFieldName]: string }
+          )[passwordFieldName];
+
+          if (emailValue && passwordValue) {
             return {
               authenticationMethod: AuthenticationMethod.emailPassword,
               authenticationMethodValue: {
-                [config.passwordEmailFieldNames?.emailFieldName ?? "email"]:
-                  request.body[
-                    config.passwordEmailFieldNames?.emailFieldName ?? "email"
-                  ],
-                [config.passwordEmailFieldNames?.passwordFieldName ??
-                "password"]:
-                  request.body[
-                    config.passwordEmailFieldNames?.passwordFieldName ??
-                      "password"
-                  ],
+                [emailFieldName]: emailValue,
+                [passwordFieldName]: passwordValue,
               },
             };
           }
