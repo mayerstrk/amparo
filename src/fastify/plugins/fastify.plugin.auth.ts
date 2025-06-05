@@ -10,16 +10,16 @@ const enum AuthenticationMethod {
   xApiKey = "xApiKey",
   emailPassword = "emailPassword",
 }
-
+interface OptionsForGetRequestByAuthMethodHelper {
+  passwordEmailFieldNames?: {
+    passwordFieldName: string;
+    emailFieldName: string;
+  };
+  jwtCookieName?: string;
+}
 const authPlugin = fp(
   async <
-    OptionsForGetRequestByAuthMethodHelper extends {
-      passwordEmailFieldNames?: {
-        passwordFieldName: string;
-        emailFieldName: string;
-      };
-      jwtCookieName?: string;
-    },
+    O extends OptionsForGetRequestByAuthMethodHelper,
     RequestUser extends { id: string } = { id: string },
   >(
     fastify: FastifyInstance,
@@ -27,9 +27,9 @@ const authPlugin = fp(
       getRequestUserByAuthMethodHelper: (
         authenticationMethod: AuthenticationMethod,
         authenticationMethodValue: string | Record<string, unknown>,
-        options?: OptionsForGetRequestByAuthMethodHelper,
+        options?: O,
       ) => Promise<RequestUser>;
-      getUserByAuthMethodHelperOptions?: OptionsForGetRequestByAuthMethodHelper;
+      getUserByAuthMethodHelperOptions?: O;
     },
   ) => {
     fastify.decorateRequest("_user");
