@@ -1,12 +1,13 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 import { ErrorName } from "../../common";
-import { assert, safe, assertWithTypeguard } from "../../core/core.assert";
+import { assert } from "../../core/core.assert";
 import cookie from "@fastify/cookie";
 
 const enum AuthenticationMethod {
   cookieJwt = "cookieJwt",
   xApiKey = "xApiKey",
+  emailPassword = "emailPassword",
 }
 
 const authPlugin = fp(
@@ -16,6 +17,11 @@ const authPlugin = fp(
   >(
     fastify: FastifyInstance,
     config: {
+      passwordEmailFieldNames?: {
+        passwordFieldName: string;
+        emailFieldName: string;
+      };
+      jwtCookieName?: string;
       getRequestUserByAuthMethodHelper: (
         authenticationMethod: AuthenticationMethod,
         authenticationMethodValue: string,
@@ -26,7 +32,11 @@ const authPlugin = fp(
   ) => {
     fastify.decorateRequest("_user");
     fastify.register(cookie);
-    const authenticate = async (request: FastifyRequest) => {
+    const authenticate = async (
+      request: FastifyRequest & {
+        body: Record<string, unknown>;
+      },
+    ) => {
       const { authenticationMethod, authenticationMethodValue } = assert(
         (() => {
           const apiKey = Array.isArray(request.headers["x-api-key"])
@@ -38,10 +48,28 @@ const authPlugin = fp(
               authenticationMethodValue: apiKey,
             };
           }
-          if (request.cookies["jwt"]) {
+          //TODO: Cookie name should be passed down from consumer
+          if (request.cookies[config.jwtCookieName ?? "jwt"]) {
             return {
               authenticationMethod: AuthenticationMethod.cookieJwt,
               authenticationMethodValue: request.cookies["jwt"],
+            };
+          }
+          if (config.passwordEmailFieldNames?.emailFieldName ?? "email") {
+            return {
+              authenticationMethod: AuthenticationMethod.emailPassword,
+              authenticationMethodValue: {
+                [config.passwordEmailFieldNames?.emailFieldName ?? "email"]:
+                  request.body[
+                    config.passwordEmailFieldNames?.emailFieldName ?? "email"
+                  ],
+                [config.passwordEmailFieldNames?.passwordFieldName ??
+                "password"]:
+                  request.body[
+                    config.passwordEmailFieldNames?.passwordFieldName ??
+                      "password"
+                  ],
+              },
             };
           }
         })(),
