@@ -46,9 +46,7 @@ const authPlugin = fp(
             };
           }
 
-          //TODO: Cookie name should be passed down from consumer
           const jwtCookie = request.cookies[config.jwtCookieName ?? "jwt"];
-
           if (jwtCookie) {
             return {
               authenticationMethod: AuthenticationMethod.cookieJwt,
@@ -56,24 +54,25 @@ const authPlugin = fp(
             };
           }
 
-          const emailFieldName =
-            config.passwordEmailFieldNames?.emailFieldName ?? "email";
-          const passwordFieldName =
-            config.passwordEmailFieldNames?.passwordFieldName ?? "password";
-
-          const emailValue = (request.body as { [emailFieldName]: string })[
-            emailFieldName
-          ];
-          const passwordValue = (
-            request.body as { [passwordFieldName]: string }
-          )[passwordFieldName];
-
-          if (emailValue && passwordValue) {
+          if (
+            (request.body as Record<string, unknown>)[
+              config.passwordEmailFieldNames?.emailFieldName ?? "email"
+            ] &&
+            (request.body as Record<string, unknown>)[
+              config.passwordEmailFieldNames?.passwordFieldName ?? "password"
+            ]
+          ) {
             return {
               authenticationMethod: AuthenticationMethod.emailPassword,
               authenticationMethodValue: {
-                [emailFieldName]: emailValue,
-                [passwordFieldName]: passwordValue,
+                [config.passwordEmailFieldNames?.emailFieldName ?? "email"]: (
+                  request.body as Record<string, unknown>
+                )[config.passwordEmailFieldNames?.emailFieldName ?? "email"],
+                [config.passwordEmailFieldNames?.passwordFieldName ??
+                "password"]: (request.body as Record<string, unknown>)[
+                  config.passwordEmailFieldNames?.passwordFieldName ??
+                    "password"
+                ],
               },
             };
           }
