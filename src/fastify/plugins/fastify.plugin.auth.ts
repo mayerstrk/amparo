@@ -13,16 +13,17 @@ const enum AuthenticationMethod {
 
 const authPlugin = fp(
   async <
-    OptionsForGetRequestByAuthMethodHelper extends Record<string, unknown>,
-    RequestUser extends { id: string } = { id: string },
-  >(
-    fastify: FastifyInstance,
-    config: {
+    OptionsForGetRequestByAuthMethodHelper extends {
       passwordEmailFieldNames?: {
         passwordFieldName: string;
         emailFieldName: string;
       };
       jwtCookieName?: string;
+    },
+    RequestUser extends { id: string } = { id: string },
+  >(
+    fastify: FastifyInstance,
+    config: {
       getRequestUserByAuthMethodHelper: (
         authenticationMethod: AuthenticationMethod,
         authenticationMethodValue: string | Record<string, unknown>,
@@ -36,9 +37,6 @@ const authPlugin = fp(
     const authenticate = async (request: FastifyRequest) => {
       const { authenticationMethod, authenticationMethodValue } = assert(
         (() => {
-          console.warn(
-            `==================================================== ${config.passwordEmailFieldNames?.emailFieldName}`,
-          );
           const apiKey = Array.isArray(request.headers["x-api-key"])
             ? request.headers["x-api-key"][0]
             : request.headers["x-api-key"];
@@ -49,7 +47,10 @@ const authPlugin = fp(
             };
           }
 
-          const jwtCookie = request.cookies[config.jwtCookieName ?? "jwt"];
+          const jwtCookie =
+            request.cookies[
+              config.getUserByAuthMethodHelperOptions?.jwtCookieName ?? "jwt"
+            ];
           if (jwtCookie) {
             return {
               authenticationMethod: AuthenticationMethod.cookieJwt,
@@ -59,22 +60,30 @@ const authPlugin = fp(
 
           if (
             (request.body as Record<string, unknown>)[
-              config.passwordEmailFieldNames?.emailFieldName ?? "email"
+              config.getUserByAuthMethodHelperOptions?.passwordEmailFieldNames
+                ?.emailFieldName ?? "email"
             ] &&
             (request.body as Record<string, unknown>)[
-              config.passwordEmailFieldNames?.passwordFieldName ?? "password"
+              config.getUserByAuthMethodHelperOptions?.passwordEmailFieldNames
+                ?.passwordFieldName ?? "password"
             ]
           ) {
             return {
               authenticationMethod: AuthenticationMethod.emailPassword,
               authenticationMethodValue: {
-                [config.passwordEmailFieldNames?.emailFieldName ?? "email"]: (
+                [config.getUserByAuthMethodHelperOptions
+                  ?.passwordEmailFieldNames?.emailFieldName ?? "email"]: (
                   request.body as Record<string, unknown>
-                )[config.passwordEmailFieldNames?.emailFieldName ?? "email"],
-                [config.passwordEmailFieldNames?.passwordFieldName ??
-                "password"]: (request.body as Record<string, unknown>)[
-                  config.passwordEmailFieldNames?.passwordFieldName ??
-                    "password"
+                )[
+                  config.getUserByAuthMethodHelperOptions
+                    ?.passwordEmailFieldNames?.emailFieldName ?? "email"
+                ],
+                [config.getUserByAuthMethodHelperOptions
+                  ?.passwordEmailFieldNames?.passwordFieldName ?? "password"]: (
+                  request.body as Record<string, unknown>
+                )[
+                  config.getUserByAuthMethodHelperOptions
+                    ?.passwordEmailFieldNames?.passwordFieldName ?? "password"
                 ],
               },
             };
