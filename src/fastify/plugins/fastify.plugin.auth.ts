@@ -7,14 +7,11 @@ import { safe } from "../../core";
 
 const enum AuthenticationMethod {
   cookieJwt = "cookieJwt",
+  bearer = "bearer",
   xApiKey = "xApiKey",
-  emailPassword = "emailPassword",
 }
+
 interface OptionsForGetRequestByAuthMethodHelper {
-  passwordEmailFieldNames?: {
-    passwordFieldName: string;
-    emailFieldName: string;
-  };
   jwtCookieName?: string;
 }
 const authPlugin = fp(
@@ -47,6 +44,15 @@ const authPlugin = fp(
             };
           }
 
+          const authHeader = request.headers.authorization;
+          if (authHeader && authHeader.startsWith("Bearer ")) {
+            const bearerToken = authHeader.substring(7);
+            return {
+              authenticationMethod: AuthenticationMethod.bearer,
+              authenticationMethodValue: bearerToken,
+            };
+          }
+
           const jwtCookie =
             request.cookies[
               config.getUserByAuthMethodHelperOptions?.jwtCookieName ?? "jwt"
@@ -55,37 +61,6 @@ const authPlugin = fp(
             return {
               authenticationMethod: AuthenticationMethod.cookieJwt,
               authenticationMethodValue: jwtCookie,
-            };
-          }
-
-          if (
-            (request.body as Record<string, unknown>)[
-              config.getUserByAuthMethodHelperOptions?.passwordEmailFieldNames
-                ?.emailFieldName ?? "email"
-            ] &&
-            (request.body as Record<string, unknown>)[
-              config.getUserByAuthMethodHelperOptions?.passwordEmailFieldNames
-                ?.passwordFieldName ?? "password"
-            ]
-          ) {
-            return {
-              authenticationMethod: AuthenticationMethod.emailPassword,
-              authenticationMethodValue: {
-                [config.getUserByAuthMethodHelperOptions
-                  ?.passwordEmailFieldNames?.emailFieldName ?? "email"]: (
-                  request.body as Record<string, unknown>
-                )[
-                  config.getUserByAuthMethodHelperOptions
-                    ?.passwordEmailFieldNames?.emailFieldName ?? "email"
-                ],
-                [config.getUserByAuthMethodHelperOptions
-                  ?.passwordEmailFieldNames?.passwordFieldName ?? "password"]: (
-                  request.body as Record<string, unknown>
-                )[
-                  config.getUserByAuthMethodHelperOptions
-                    ?.passwordEmailFieldNames?.passwordFieldName ?? "password"
-                ],
-              },
             };
           }
         })(),
