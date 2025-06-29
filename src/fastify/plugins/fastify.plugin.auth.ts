@@ -16,21 +16,21 @@ const authPlugin = fp(
   async <
     Options extends
       | NotEmpty<Record<string, unknown> & { jwtCookieName?: string }>
-      | never = never,
+      | undefined = undefined,
     OptionsForGetRequestByAuthMethodHelper extends
       | NotEmpty<Record<string, unknown>>
-      | never = never,
+      | undefined = undefined,
     RequestUser extends { id: string } = { id: string },
   >(
     fastify: FastifyInstance,
     config: {
-      options: Options;
+      options?: Options;
       getRequestUserByAuthMethodHelper: (
         authenticationMethod: AuthenticationMethod,
         authenticationMethodValue: string,
         options?: OptionsForGetRequestByAuthMethodHelper,
       ) => Promise<RequestUser>;
-      getUserByAuthMethodHelperOptions: OptionsForGetRequestByAuthMethodHelper;
+      getUserByAuthMethodHelperOptions?: OptionsForGetRequestByAuthMethodHelper;
     },
   ) => {
     fastify.decorateRequest("_user");
