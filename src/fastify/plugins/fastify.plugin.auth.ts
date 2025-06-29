@@ -11,15 +11,20 @@ const enum AuthenticationMethod {
   xApiKey = "xApiKey",
 }
 
+type NotEmpty<T> = keyof T extends never ? never : T;
 const authPlugin = fp(
   async <
-    OptionsForGetRequestByAuthMethodHelper extends {
-      jwtCookieName?: string;
-    },
+    Options extends
+      | NotEmpty<Record<string, unknown> & { jwtCookieName?: string }>
+      | undefined = undefined,
+    OptionsForGetRequestByAuthMethodHelper extends
+      | NotEmpty<Record<string, unknown>>
+      | undefined = undefined,
     RequestUser extends { id: string } = { id: string },
   >(
     fastify: FastifyInstance,
     config: {
+      options: Options;
       getRequestUserByAuthMethodHelper: (
         authenticationMethod: AuthenticationMethod,
         authenticationMethodValue: string,
@@ -53,9 +58,7 @@ const authPlugin = fp(
           }
 
           const jwtCookie =
-            request.cookies[
-              config.getUserByAuthMethodHelperOptions?.jwtCookieName ?? "jwt"
-            ];
+            request.cookies[config.options?.jwtCookieName ?? "jwt"];
           if (jwtCookie) {
             return {
               authenticationMethod: AuthenticationMethod.cookieJwt,
