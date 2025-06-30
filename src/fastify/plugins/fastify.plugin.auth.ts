@@ -70,7 +70,7 @@ async function authPluginFn<
   fastify: FastifyInstance,
   config: {
     options?: Options;
-    getRequestUserByAuthMethodHelper: <RequestUser>(
+    getRequestUserByAuthMethodHelper: (
       authenticationMethod: AuthenticationMethod,
       authenticationMethodValue: string,
       options?: OptionsForGetRequestByAuthMethodHelper,
