@@ -18,9 +18,11 @@ async function authPluginFn<
 >(
   fastify: FastifyInstance,
   config: {
+    options?: never;
     getRequestUserByAuthMethodHelper: (
       authenticationMethod: AuthenticationMethod,
       authenticationMethodValue: string,
+      options?: never,
     ) => Promise<RequestUser>;
   },
 ): Promise<void>;
@@ -37,6 +39,7 @@ async function authPluginFn<
     getRequestUserByAuthMethodHelper: (
       authenticationMethod: AuthenticationMethod,
       authenticationMethodValue: string,
+      options?: never,
     ) => Promise<RequestUser>;
   },
 ): Promise<void>;
@@ -49,10 +52,11 @@ async function authPluginFn<
 >(
   fastify: FastifyInstance,
   config: {
+    options?: never;
     getRequestUserByAuthMethodHelper: (
       authenticationMethod: AuthenticationMethod,
       authenticationMethodValue: string,
-      options?: OptionsForGetRequestByAuthMethodHelper,
+      options: OptionsForGetRequestByAuthMethodHelper,
     ) => Promise<RequestUser>;
     getUserByAuthMethodHelperOptions?: OptionsForGetRequestByAuthMethodHelper;
   },
@@ -69,11 +73,11 @@ async function authPluginFn<
 >(
   fastify: FastifyInstance,
   config: {
-    options?: Options;
+    options: Options;
     getRequestUserByAuthMethodHelper: <RequestUser>(
       authenticationMethod: AuthenticationMethod,
       authenticationMethodValue: string,
-      options?: OptionsForGetRequestByAuthMethodHelper,
+      options: OptionsForGetRequestByAuthMethodHelper,
     ) => Promise<RequestUser>;
     getUserByAuthMethodHelperOptions?: OptionsForGetRequestByAuthMethodHelper;
   },
