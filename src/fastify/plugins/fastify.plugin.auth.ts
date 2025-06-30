@@ -5,7 +5,7 @@ import { assert } from "../../core/core.assert";
 import cookie from "@fastify/cookie";
 import { safe } from "../../core";
 
-// === Type Definitions ===
+// --- Type Definitions ---
 
 const enum AuthenticationMethod {
   cookieJwt = "cookieJwt",
@@ -15,91 +15,98 @@ const enum AuthenticationMethod {
 
 type RequestUser = { id: string };
 
-// We define the different shapes our config object can take.
+/**
+ * A utility type that evaluates to `never` if T is an empty object `{}`,
+ * otherwise evaluates to T. This is used to constrain our generics.
+ */
+type NotEmpty<T> = keyof T extends never ? never : T;
 
-// 1. Base config shape, always present.
-type BaseConfig<OFH, RU extends RequestUser> = {
+/**
+ * The base configuration shape that is always required by the plugin.
+ */
+type BaseConfig<
+  OptionsForGetRequestByAuthMethodHelper,
+  RU extends RequestUser,
+> = {
   getRequestUserByAuthMethodHelper: (
     authenticationMethod: AuthenticationMethod,
     authenticationMethodValue: string,
-    options: OFH,
+    options: OptionsForGetRequestByAuthMethodHelper,
   ) => Promise<RU>;
 };
 
-// 2. Config when NEITHER option generic is provided.
-// `property?: never` is a trick to forbid a property.
-type ConfigWithNoOptions<RU extends RequestUser> = BaseConfig<undefined, RU> & {
-  options?: never;
-  getUserByAuthMethodHelperOptions?: never;
-};
+// --- Overloaded Function Declaration ---
+// Here we explicitly define the 4 valid signatures for our plugin.
 
-// 3. Config when ONLY top-level `options` is provided.
-type ConfigWithOptions<O, RU extends RequestUser> = BaseConfig<
-  undefined,
-  RU
-> & {
-  options: O;
-  getUserByAuthMethodHelperOptions?: never;
-};
-
-// 4. Config when ONLY the helper's `options` is provided.
-type ConfigWithHelperOptions<OFH, RU extends RequestUser> = BaseConfig<
-  OFH,
-  RU
-> & {
-  options?: never;
-  getUserByAuthMethodHelperOptions: OFH;
-};
-
-// 5. Config when BOTH options are provided.
-type ConfigWithBothOptions<O, OFH, RU extends RequestUser> = BaseConfig<
-  OFH,
-  RU
-> & {
-  options: O;
-  getUserByAuthMethodHelperOptions: OFH;
-};
-
-// === Overloaded Function Declaration ===
-
-// Overload for neither options
+// Overload 1: For when NEITHER `options` key is provided.
 function authPluginFn<RU extends RequestUser>(
   fastify: FastifyInstance,
-  config: ConfigWithNoOptions<RU>,
+  config: BaseConfig<undefined, RU> & {
+    options?: never; // `never` forbids this key from being passed.
+    getUserByAuthMethodHelperOptions?: never;
+  },
 ): Promise<void>;
 
-// Overload for only `options`
+// Overload 2: For when ONLY the top-level `options` is provided.
 function authPluginFn<
-  O extends { jwtCookieName?: string },
-  RU extends RequestUser,
->(fastify: FastifyInstance, config: ConfigWithOptions<O, RU>): Promise<void>;
-
-// Overload for only `getUserByAuthMethodHelperOptions`
-function authPluginFn<OFH extends Record<string, any>, RU extends RequestUser>(
-  fastify: FastifyInstance,
-  config: ConfigWithHelperOptions<OFH, RU>,
-): Promise<void>;
-
-// Overload for BOTH options
-function authPluginFn<
-  O extends { jwtCookieName?: string },
-  OFH extends Record<string, any>,
+  Options extends NotEmpty<
+    Record<string, unknown> & { jwtCookieName?: string }
+  >,
   RU extends RequestUser,
 >(
   fastify: FastifyInstance,
-  config: ConfigWithBothOptions<O, OFH, RU>,
+  config: BaseConfig<undefined, RU> & {
+    options: Options;
+    getUserByAuthMethodHelperOptions?: never;
+  },
 ): Promise<void>;
 
-// === Single Implementation ===
+// Overload 3: For when ONLY `getUserByAuthMethodHelperOptions` is provided.
+function authPluginFn<
+  OptionsForGetRequestByAuthMethodHelper extends NotEmpty<
+    Record<string, unknown>
+  >,
+  RU extends RequestUser,
+>(
+  fastify: FastifyInstance,
+  config: BaseConfig<OptionsForGetRequestByAuthMethodHelper, RU> & {
+    options?: never;
+    getUserByAuthMethodHelperOptions: OptionsForGetRequestByAuthMethodHelper;
+  },
+): Promise<void>;
+
+// Overload 4: For when BOTH `options` keys are provided.
+function authPluginFn<
+  Options extends NotEmpty<
+    Record<string, unknown> & { jwtCookieName?: string }
+  >,
+  OptionsForGetRequestByAuthMethodHelper extends NotEmpty<
+    Record<string, unknown>
+  >,
+  RU extends RequestUser,
+>(
+  fastify: FastifyInstance,
+  config: BaseConfig<OptionsForGetRequestByAuthMethodHelper, RU> & {
+    options: Options;
+    getUserByAuthMethodHelperOptions: OptionsForGetRequestByAuthMethodHelper;
+  },
+): Promise<void>;
+
+// --- Single Implementation ---
+// The actual function body, compatible with all overloads.
 async function authPluginFn(
   fastify: FastifyInstance,
-  config:
-    | ConfigWithNoOptions<any>
-    | ConfigWithOptions<any, any>
-    | ConfigWithHelperOptions<any, any>
-    | ConfigWithBothOptions<any, any, any>,
+  config: {
+    getRequestUserByAuthMethodHelper: (
+      authenticationMethod: AuthenticationMethod,
+      authenticationMethodValue: string,
+      options: unknown,
+    ) => Promise<RequestUser>;
+    options?: { jwtCookieName?: string };
+    getUserByAuthMethodHelperOptions?: unknown;
+  },
 ): Promise<void> {
-  // Your existing plugin logic goes here, unchanged.
+  // Your plugin logic, now fully type-safe.
   fastify.decorateRequest("_user", null);
   fastify.register(cookie);
 
@@ -109,34 +116,30 @@ async function authPluginFn(
         const apiKey = Array.isArray(request.headers["x-api-key"])
           ? request.headers["x-api-key"][0]
           : request.headers["x-api-key"];
-        if (apiKey) {
+        if (apiKey)
           return {
             authenticationMethod: AuthenticationMethod.xApiKey,
             authenticationMethodValue: apiKey,
           };
-        }
 
         const authHeader = request.headers.authorization;
-        if (authHeader && authHeader.startsWith("Bearer ")) {
-          const bearerToken = authHeader.substring(7);
+        if (authHeader?.startsWith("Bearer "))
           return {
             authenticationMethod: AuthenticationMethod.bearer,
-            authenticationMethodValue: bearerToken,
+            authenticationMethodValue: authHeader.substring(7),
           };
-        }
 
+        // Safely access options using the `in` type guard to satisfy TypeScript
         const jwtCookieName =
           "options" in config && config.options?.jwtCookieName
             ? config.options.jwtCookieName
             : "jwt";
         const jwtCookie = request.cookies[jwtCookieName];
-
-        if (jwtCookie) {
+        if (jwtCookie)
           return {
             authenticationMethod: AuthenticationMethod.cookieJwt,
             authenticationMethodValue: jwtCookie,
           };
-        }
       })(),
       "No authentication method found",
       ErrorName.authentication,
@@ -148,11 +151,12 @@ async function authPluginFn(
         authenticationMethodValue,
         config.getUserByAuthMethodHelperOptions,
       ),
-      "Falid to get user by auth method",
+      "Failed to get user by auth method",
       ErrorName.authentication,
     );
 
-    (request as any)._user = requestUser;
+    // Using a type assertion on the request object, avoiding module augmentation
+    (request as FastifyRequest & { _user: RequestUser })._user = requestUser;
   };
 
   fastify.addHook("onRoute", (routeOptions) => {
@@ -169,7 +173,10 @@ async function authPluginFn(
   });
 }
 
-// Finally, we wrap our overloaded function with fastify-plugin.
-const authPlugin = fp(authPluginFn as FastifyPluginAsync<any>);
+// A type assertion is still necessary here to reconcile the multiple, complex
+// overload signatures with the generic FastifyPluginAsync type that `fp` expects.
+const authPlugin = fp(
+  authPluginFn as FastifyPluginAsync<Record<string, unknown>>,
+);
 
 export { AuthenticationMethod, authPlugin };
