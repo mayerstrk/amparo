@@ -161,6 +161,7 @@ async function authPluginFn<
       }
     }
   });
+  console.log("Hi");
 }
 
 export { AuthenticationMethod };
